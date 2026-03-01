@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     # --- OpenAI --------------------------------------------------------------
     openai_api_key: str = ""
 
+    # --- Database (Phase 2) --------------------------------------------------
+    database_url: str = "postgresql://postgres:postgres@localhost:5432/chesscoach"
+
+    # --- JWT Auth (Phase 2) --------------------------------------------------
+    jwt_secret_key: str = "change-me-in-production-use-a-random-64-char-string"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 1440  # 24 hours
+
     # --- Server --------------------------------------------------------------
     cors_origins: list[str] = ["http://localhost:5173"]
 

@@ -6,3 +6,9 @@ openai==1.58.1
 pydantic==2.10.4
 pydantic-settings==2.7.1
 httpx==0.28.1
+# Phase 2 — persistence & auth
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+python-jose[cryptography]==3.4.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1

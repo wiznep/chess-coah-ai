@@ -44,6 +44,7 @@ class MoveAnalysis:
     best_move_san: str | None       # engine's preferred move (SAN)
     best_move_uci: str | None       # engine's preferred move (UCI)
 
+    fen_before: str = ""            # FEN *before* the move (for puzzles)
     is_capture_next: bool = False   # basic tactical tag (hanging piece)
     coach_explanation: str = ""     # filled in later by coach.py
 
@@ -92,6 +93,9 @@ async def analyze_pgn(pgn_text: str) -> GameAnalysis:
         move_san = board.san(move)
         move_uci = move.uci()
 
+        # --- Capture FEN *before* the move (critical for puzzles) ----------
+        fen_before = board.fen()
+
         # --- Get the engine's best move *before* the player moves ----------
         _, best_move = await engine_manager.evaluate_position(board)
         best_move_san: str | None = None
@@ -136,6 +140,7 @@ async def analyze_pgn(pgn_text: str) -> GameAnalysis:
                 classification=classification,
                 best_move_san=best_move_san,
                 best_move_uci=best_move_uci,
+                fen_before=fen_before,
                 is_capture_next=is_capture_next,
             )
         )

@@ -9,6 +9,11 @@ export default defineConfig({
     proxy: {
       '/analyze': 'http://localhost:8000',
       '/health': 'http://localhost:8000',
+      '/register': 'http://localhost:8000',
+      '/login': 'http://localhost:8000',
+      '/games': 'http://localhost:8000',
+      '/analytics': 'http://localhost:8000',
+      '/puzzles': 'http://localhost:8000',
     },
   },
 })

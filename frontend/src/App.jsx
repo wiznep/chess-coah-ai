@@ -1,136 +1,133 @@
-import { useState, useCallback, useEffect } from "react";
-import PGNUploader from "./components/PGNUploader";
-import Board from "./components/Board";
-import FeedbackPanel from "./components/FeedbackPanel";
-import MoveList from "./components/MoveList";
-import { analyzeGame } from "./api";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import useAuthStore from "./store/authStore";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AnalyzePage from "./pages/AnalyzePage";
+import Dashboard from "./pages/Dashboard";
+import GameLibrary from "./pages/GameLibrary";
+import GameView from "./pages/GameView";
+import PuzzleTrainer from "./pages/PuzzleTrainer";
 import "./App.css";
 
-function App() {
-  const [analysis, setAnalysis] = useState(null); // full backend response
-  const [currentPly, setCurrentPly] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+/** Redirect to /login if not authenticated */
+function ProtectedRoute({ children }) {
+  const token = useAuthStore((s) => s.token);
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+}
 
-  // ---- Analyze handler ----
-  const handleAnalyze = useCallback(async (pgn) => {
-    setLoading(true);
-    setError(null);
-    setAnalysis(null);
-    setCurrentPly(0);
-    try {
-      const data = await analyzeGame(pgn);
-      setAnalysis(data);
-    } catch (err) {
-      setError(err.message || "Analysis failed.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+function Navbar() {
+  const { username, logout } = useAuthStore();
+  const location = useLocation();
 
-  // ---- Keyboard navigation ----
-  useEffect(() => {
-    if (!analysis) return;
-    const handler = (e) => {
-      if (e.key === "ArrowRight") {
-        setCurrentPly((p) => Math.min(analysis.moves.length, p + 1));
-      } else if (e.key === "ArrowLeft") {
-        setCurrentPly((p) => Math.max(0, p - 1));
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [analysis]);
-
-  const currentMove = analysis && currentPly > 0 ? analysis.moves[currentPly - 1] : null;
-
-  // ---- Summary stats ----
-  const stats = analysis
-    ? {
-        inaccuracies: analysis.moves.filter((m) => m.classification === "Inaccuracy").length,
-        mistakes: analysis.moves.filter((m) => m.classification === "Mistake").length,
-        blunders: analysis.moves.filter((m) => m.classification === "Blunder").length,
-      }
-    : null;
+  const links = [
+    { to: "/", label: "Analyze" },
+    { to: "/games", label: "My Games" },
+    { to: "/dashboard", label: "Dashboard" },
+    { to: "/puzzles", label: "Puzzle Trainer" },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 text-white">
-      {/* ---- Header ---- */}
-      <header className="border-b border-gray-800 bg-gray-900/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <h1 className="text-xl font-bold tracking-tight">
+    <header className="border-b border-gray-800 bg-gray-900/70 backdrop-blur sticky top-0 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-xl font-bold tracking-tight text-white">
             <span className="text-indigo-400">♟</span> AI Chess Coach
-          </h1>
-          
-        </div>
-      </header>
+          </Link>
 
-      {/* ---- Main layout ---- */}
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        {!analysis ? (
-          /* ---------- Upload screen ---------- */
-          <div className="mx-auto max-w-xl">
-            <PGNUploader onAnalyze={handleAnalyze} loading={loading} />
-            {error && (
-              <p className="mt-4 rounded-lg bg-red-900/30 p-3 text-sm text-red-400">
-                {error}
-              </p>
-            )}
-          </div>
-        ) : (
-          /* ---------- Analysis screen ---------- */
-          <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-            {/* Left: board */}
-            <div className="flex flex-col gap-4">
-              {/* Game info bar */}
-              <div className="flex flex-wrap items-center gap-4 rounded-lg bg-gray-800/50 px-4 py-2 text-sm">
-                <span>
-                  <strong className="text-white">{analysis.white}</strong>{" "}
-                  <span className="text-gray-500">vs</span>{" "}
-                  <strong className="text-white">{analysis.black}</strong>
-                </span>
-                <span className="text-gray-500">|</span>
-                <span className="text-gray-400">{analysis.result}</span>
-                {stats && (
-                  <>
-                    <span className="text-gray-500">|</span>
-                    <span className="text-yellow-400">{stats.inaccuracies} inaccuracies</span>
-                    <span className="text-orange-400">{stats.mistakes} mistakes</span>
-                    <span className="text-red-400">{stats.blunders} blunders</span>
-                  </>
-                )}
-              </div>
-
-              <Board
-                moves={analysis.moves}
-                currentPly={currentPly}
-                onPlyChange={setCurrentPly}
-              />
-            </div>
-
-            {/* Right: panel */}
-            <div className="flex flex-col gap-4">
-              <FeedbackPanel move={currentMove} gameInfo={analysis} />
-              <MoveList
-                moves={analysis.moves}
-                currentPly={currentPly}
-                onPlyChange={setCurrentPly}
-              />
-              <button
-                onClick={() => {
-                  setAnalysis(null);
-                  setCurrentPly(0);
-                }}
-                className="rounded-lg border border-gray-700 px-4 py-2 text-sm
-                           text-gray-400 hover:bg-gray-800 transition"
+          <nav className="hidden sm:flex items-center gap-1">
+            {links.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={`rounded-lg px-3 py-1.5 text-sm transition ${
+                  location.pathname === l.to
+                    ? "bg-indigo-600/20 text-indigo-400 font-semibold"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
               >
-                ← Analyze another game
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-400">{username}</span>
+          <button
+            onClick={logout}
+            className="rounded-lg border border-gray-700 px-3 py-1 text-xs text-gray-400
+                       hover:bg-gray-800 hover:text-white transition"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function AppShell({ children }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 text-white">
+      <Navbar />
+      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <AppShell><AnalyzePage /></AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/games"
+        element={
+          <ProtectedRoute>
+            <AppShell><GameLibrary /></AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/games/:gameId"
+        element={
+          <ProtectedRoute>
+            <AppShell><GameView /></AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <AppShell><Dashboard /></AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/puzzles"
+        element={
+          <ProtectedRoute>
+            <AppShell><PuzzleTrainer /></AppShell>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

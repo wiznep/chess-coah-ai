@@ -1,4 +1,4 @@
-# ♟ AI Chess Coach — Phase 1
+# ♟ AI Chess Coach
 
 A web application where users upload a PGN (chess game), have it analysed by
 Stockfish, and receive colour-coded move classifications plus AI-generated
