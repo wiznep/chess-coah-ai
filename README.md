@@ -26,8 +26,7 @@ chess-coach-project/
 │   ├── coach.py           # OpenAI coaching explanations
 │   ├── main.py            # FastAPI app + /analyze endpoint
 │   ├── requirements.txt
-│   ├── .env.example
-│   └── stockfish/         # Stockfish binary (auto-downloaded)
+│   └── .env.example
 └── frontend/
     ├── src/
     │   ├── api.js                   # Backend API client
@@ -51,7 +50,7 @@ chess-coach-project/
 
 - **Python 3.10+** (3.12 recommended)
 - **Node.js 18+**
-- **Stockfish** (downloaded automatically — see below)
+- **Stockfish** installed on your system (`sudo apt install stockfish` on Ubuntu/Debian)
 
 ### 1. Backend
 
@@ -62,12 +61,6 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-
-# Download Stockfish (Linux x86-64 AVX2)
-mkdir -p stockfish && cd stockfish
-curl -sL https://github.com/official-stockfish/Stockfish/releases/latest/download/stockfish-ubuntu-x86-64-avx2.tar | tar -x
-chmod +x stockfish/stockfish-ubuntu-x86-64-avx2
-cd ..
 
 # (Optional) Create .env with your OpenAI key for real coaching text
 cp .env.example .env
@@ -105,16 +98,16 @@ requests to the backend at `localhost:8000`.
 
 ---
 
-## Stockfish on Other Platforms
+## Stockfish Installation
 
-| OS      | Binary URL |
-|---------|-----------|
-| Linux   | `stockfish-ubuntu-x86-64-avx2.tar` |
-| macOS   | `stockfish-macos-m1-apple-silicon.tar` |
-| Windows | `stockfish-windows-x86-64-avx2.zip` |
+| OS      | Install Command |
+|---------|-----------------|
+| Ubuntu/Debian | `sudo apt install stockfish` |
+| macOS   | `brew install stockfish` |
+| Windows | Download from https://stockfishchess.org/download/ |
 
-Download from https://github.com/official-stockfish/Stockfish/releases and
-update `STOCKFISH_PATH` in your `.env`.
+The app defaults to `/usr/games/stockfish`. If your binary is elsewhere,
+set `STOCKFISH_PATH` in your `backend/.env`.
 
 ---
 
@@ -122,7 +115,7 @@ update `STOCKFISH_PATH` in your `.env`.
 
 | Variable           | Default                                   | Description                        |
 |--------------------|-------------------------------------------|------------------------------------|
-| `STOCKFISH_PATH`   | `./stockfish/stockfish/stockfish-ubuntu…`  | Path to the Stockfish binary       |
+| `STOCKFISH_PATH`   | `/usr/games/stockfish`                    | Path to the Stockfish binary       |
 | `ENGINE_DEPTH`     | `15`                                      | Max search depth per move          |
 | `ENGINE_TIME_LIMIT`| `0.1`                                     | Max seconds per move               |
 | `OPENAI_API_KEY`   | *(empty — mock mode)*                     | OpenAI API key for coaching text   |
