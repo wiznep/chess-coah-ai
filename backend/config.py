@@ -3,14 +3,11 @@ Application configuration — loaded from environment variables / .env file.
 """
 
 from pydantic_settings import BaseSettings
-from pathlib import Path
 
 
 class Settings(BaseSettings):
     # --- Stockfish -----------------------------------------------------------
-    stockfish_path: str = str(
-        Path(__file__).resolve().parent / "stockfish" / "stockfish" / "stockfish-ubuntu-x86-64-avx2"
-    )
+    stockfish_path: str = "/usr/games/stockfish"
     engine_depth: int = 15
     engine_time_limit: float = 0.1  # seconds per move
 
