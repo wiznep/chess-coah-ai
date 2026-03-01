@@ -1,0 +1,4 @@
+/* Minimal reset — most styling is via Tailwind utility classes */
+#root {
+  width: 100%;
+}
