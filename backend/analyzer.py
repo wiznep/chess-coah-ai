@@ -16,17 +16,17 @@ from engine import engine_manager, score_to_centipawns
 
 logger = logging.getLogger(__name__)
 
-# ------------------------------------------------------------------
+
 # Thresholds (in *pawns*, not centipawns) for move classification
-# ------------------------------------------------------------------
+
 INACCURACY_THRESHOLD = 0.50   # 50 cp
 MISTAKE_THRESHOLD = 1.00      # 100 cp
 BLUNDER_THRESHOLD = 2.00      # 200 cp
 
 
-# ------------------------------------------------------------------
+
 # Data containers
-# ------------------------------------------------------------------
+
 @dataclass
 class MoveAnalysis:
     """Analysis result for a single half-move."""
@@ -59,9 +59,9 @@ class GameAnalysis:
     moves: list[MoveAnalysis] = field(default_factory=list)
 
 
-# ------------------------------------------------------------------
+
 # Core analysis pipeline
-# ------------------------------------------------------------------
+
 async def analyze_pgn(pgn_text: str) -> GameAnalysis:
     """
     Parse *pgn_text*, evaluate every position with Stockfish, and return
@@ -150,9 +150,9 @@ async def analyze_pgn(pgn_text: str) -> GameAnalysis:
     return analysis
 
 
-# ------------------------------------------------------------------
+
 # Helpers
-# ------------------------------------------------------------------
+
 def _classify(drop: float) -> str:
     """Map an evaluation drop (in *pawns*) to a human-readable label."""
     if drop >= BLUNDER_THRESHOLD:

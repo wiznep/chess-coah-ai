@@ -17,9 +17,7 @@ from config import settings
 
 logger = logging.getLogger(__name__)
 
-# ------------------------------------------------------------------
-# OpenAI client (lazily initialised)
-# ------------------------------------------------------------------
+
 _client: AsyncOpenAI | None = None
 
 
@@ -28,13 +26,16 @@ def _get_client() -> AsyncOpenAI | None:
     if not settings.openai_api_key:
         return None
     if _client is None:
-        _client = AsyncOpenAI(api_key=settings.openai_api_key)
+        kwargs: dict = {"api_key": settings.openai_api_key}
+        if settings.openai_base_url:
+            kwargs["base_url"] = settings.openai_base_url
+        _client = AsyncOpenAI(**kwargs)
     return _client
 
 
-# ------------------------------------------------------------------
+
 # Prompt builder
-# ------------------------------------------------------------------
+
 SYSTEM_PROMPT = (
     "You are a friendly chess coach. Keep explanations short and encouraging. "
     "Never list long engine variations."
@@ -55,6 +56,15 @@ def _build_user_prompt(
     after_str = f"{eval_after / 100:+.2f}"
     best = best_move_san or "unknown"
 
+    if classification == "Best":
+        return (
+            f"The player (rated ~{rating}, playing as {side}) played {move_san}. "
+            f"The evaluation went from {before_str} to {after_str}. "
+            f"This was the best move. "
+            f"Briefly explain in 2 simple sentences why this is a good move "
+            f"and what it achieves strategically or tactically. Do not list long variations."
+        )
+
     return (
         f"The player (rated ~{rating}, playing as {side}) played {move_san}. "
         f"The evaluation dropped from {before_str} to {after_str} "
@@ -65,9 +75,9 @@ def _build_user_prompt(
     )
 
 
-# ------------------------------------------------------------------
+
 # Mock fallback (no API key)
-# ------------------------------------------------------------------
+
 def _mock_explanation(
     move_san: str,
     classification: str,
@@ -78,6 +88,11 @@ def _mock_explanation(
     best = best_move_san or "a better alternative"
     before_str = f"{eval_before / 100:+.2f}"
     after_str = f"{eval_after / 100:+.2f}"
+    if classification == "Best":
+        return (
+            f"{move_san} is the best move here — the evaluation is {after_str}. "
+            f"This maintains or improves your position."
+        )
     return (
         f"Playing {move_san} was a {classification.lower()} — the evaluation shifted "
         f"from {before_str} to {after_str}. "
@@ -85,25 +100,21 @@ def _mock_explanation(
     )
 
 
-# ------------------------------------------------------------------
+
 # Public API
-# ------------------------------------------------------------------
+
 async def generate_explanations(
     analysis: GameAnalysis,
     player_rating: int = 1500,
 ) -> GameAnalysis:
     """
     Mutate *analysis* in place, filling in ``coach_explanation`` for every
-    move classified as **Mistake** or **Blunder**.  Returns the same object.
+    move.  Returns the same object.
     """
     client = _get_client()
 
-    for move in analysis.moves:
-        if move.classification not in ("Mistake", "Blunder"):
-            continue
-
-        if client is None:
-            # No API key → use deterministic mock
+    if client is None:
+        for move in analysis.moves:
             move.coach_explanation = _mock_explanation(
                 move.move_san,
                 move.classification,
@@ -111,9 +122,12 @@ async def generate_explanations(
                 move.eval_before_cp,
                 move.eval_after_cp,
             )
-            continue
+        return analysis
 
-        # ---------- Real OpenAI call ----------
+    # --- Build all requests and fire them concurrently ---
+    import asyncio
+
+    async def _explain(move):
         user_msg = _build_user_prompt(
             move_san=move.move_san,
             side=move.side,
@@ -123,10 +137,9 @@ async def generate_explanations(
             classification=move.classification,
             rating=player_rating,
         )
-
         try:
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.coach_model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_msg},
@@ -138,7 +151,7 @@ async def generate_explanations(
                 response.choices[0].message.content or ""
             ).strip()
         except Exception:
-            logger.exception("OpenAI call failed for ply %d; using mock.", move.ply)
+            logger.exception("LLM call failed for ply %d; using mock.", move.ply)
             move.coach_explanation = _mock_explanation(
                 move.move_san,
                 move.classification,
@@ -146,5 +159,7 @@ async def generate_explanations(
                 move.eval_before_cp,
                 move.eval_after_cp,
             )
+
+    await asyncio.gather(*[_explain(m) for m in analysis.moves])
 
     return analysis

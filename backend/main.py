@@ -34,9 +34,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# ------------------------------------------------------------------
+
 # Application lifespan — start / stop engine + create DB tables
-# ------------------------------------------------------------------
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables if they don't exist

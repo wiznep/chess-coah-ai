@@ -26,9 +26,9 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
-# ---------------------------------------------------------------------------
+
 # User
-# ---------------------------------------------------------------------------
+
 class User(Base):
     __tablename__ = "users"
 
@@ -46,9 +46,9 @@ class User(Base):
     mistakes = relationship("Mistake", back_populates="owner", cascade="all, delete-orphan")
 
 
-# ---------------------------------------------------------------------------
+
 # Game
-# ---------------------------------------------------------------------------
+
 class Game(Base):
     __tablename__ = "games"
 
@@ -72,9 +72,9 @@ class Game(Base):
     mistakes = relationship("Mistake", back_populates="game", cascade="all, delete-orphan")
 
 
-# ---------------------------------------------------------------------------
+
 # Mistake (also serves as Puzzle)
-# ---------------------------------------------------------------------------
+
 class Mistake(Base):
     __tablename__ = "mistakes"
 

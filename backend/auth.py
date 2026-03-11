@@ -17,9 +17,9 @@ from config import settings
 from database import get_db
 from models import User
 
-# ---------------------------------------------------------------------------
+
 # Password hashing
-# ---------------------------------------------------------------------------
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -31,9 +31,9 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
-# ---------------------------------------------------------------------------
+
 # JWT helpers
-# ---------------------------------------------------------------------------
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
@@ -46,9 +46,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
 
-# ---------------------------------------------------------------------------
+
 # FastAPI dependency — get the currently authenticated user
-# ---------------------------------------------------------------------------
+
 def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),

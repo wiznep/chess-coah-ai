@@ -25,9 +25,9 @@ class EngineManager:
         self._engine: chess.engine.SimpleEngine | None = None
         self._lock = asyncio.Lock()
 
-    # ------------------------------------------------------------------
+    
     # Lifecycle
-    # ------------------------------------------------------------------
+    
     async def start(self) -> None:
         """Spawn the Stockfish process (idempotent)."""
         if self._engine is not None:
@@ -49,9 +49,9 @@ class EngineManager:
         self._engine = None
         logger.info("Stockfish stopped.")
 
-    # ------------------------------------------------------------------
+    
     # Analysis
-    # ------------------------------------------------------------------
+    
     async def evaluate_position(
         self,
         board: chess.Board,
@@ -87,9 +87,9 @@ class EngineManager:
 engine_manager = EngineManager()
 
 
-# ------------------------------------------------------------------
+
 # Helper: convert PovScore → centipawns (from White's perspective)
-# ------------------------------------------------------------------
+
 def score_to_centipawns(score: chess.engine.PovScore) -> float:
     """
     Convert an engine PovScore into a float centipawn value from **White's**

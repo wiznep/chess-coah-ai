@@ -11,8 +11,10 @@ class Settings(BaseSettings):
     engine_depth: int = 15
     engine_time_limit: float = 0.1  # seconds per move
 
-    # --- OpenAI --------------------------------------------------------------
+    # --- OpenAI / OpenRouter -------------------------------------------------
     openai_api_key: str = ""
+    openai_base_url: str = ""          # e.g. https://openrouter.ai/api/v1
+    coach_model: str = "gpt-4o-mini"   # override via COACH_MODEL env var
 
     # --- Database (Phase 2) --------------------------------------------------
     database_url: str = "postgresql://postgres:postgres@localhost:5432/chesscoach"

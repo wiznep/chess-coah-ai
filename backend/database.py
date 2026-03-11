@@ -8,9 +8,9 @@ from typing import Generator
 
 from config import settings
 
-# ---------------------------------------------------------------------------
+
 # Engine & session
-# ---------------------------------------------------------------------------
+
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=True,       # reconnect on stale connections
@@ -21,16 +21,16 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# ---------------------------------------------------------------------------
+
 # Base class for all ORM models
-# ---------------------------------------------------------------------------
+
 class Base(DeclarativeBase):
     pass
 
 
-# ---------------------------------------------------------------------------
+
 # FastAPI dependency — yields a DB session per request
-# ---------------------------------------------------------------------------
+
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
