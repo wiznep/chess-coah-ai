@@ -35,12 +35,13 @@ export default function Board({ moves, currentPly, onPlyChange }) {
     <div className="flex flex-col items-center gap-3">
       <div className="w-full max-w-[560px] aspect-square">
         <Chessboard
-          position={fen}
-          arePiecesDraggable={false}
-          customSquareStyles={customSquareStyles}
-          customDarkSquareStyle={{ backgroundColor: "#779952" }}
-          customLightSquareStyle={{ backgroundColor: "#edeed1" }}
-          boardWidth={560}
+          options={{
+            position: fen,
+            allowDragging: false,
+            squareStyles: customSquareStyles,
+            darkSquareStyle: { backgroundColor: "#779952" },
+            lightSquareStyle: { backgroundColor: "#edeed1" },
+          }}
         />
       </div>
 

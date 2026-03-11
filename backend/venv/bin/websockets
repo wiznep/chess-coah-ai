@@ -1,4 +1,4 @@
-#!/home/beesho/Desktop/chess-coach-project/backend/venv/bin/python3
+#!/home/beesho/Desktop/chess-coah-ai/backend/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

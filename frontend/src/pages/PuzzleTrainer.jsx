@@ -124,13 +124,14 @@ export default function PuzzleTrainer() {
           <div className="w-full max-w-[560px] aspect-square">
             {game && (
               <Chessboard
-                position={game.fen()}
-                onPieceDrop={handleDrop}
-                boardOrientation={boardOrientation}
-                arePiecesDraggable={feedback !== "correct"}
-                customDarkSquareStyle={{ backgroundColor: "#779952" }}
-                customLightSquareStyle={{ backgroundColor: "#edeed1" }}
-                boardWidth={560}
+                options={{
+                  position: game.fen(),
+                  onPieceDrop: handleDrop,
+                  boardOrientation: boardOrientation,
+                  allowDragging: feedback !== "correct",
+                  darkSquareStyle: { backgroundColor: "#779952" },
+                  lightSquareStyle: { backgroundColor: "#edeed1" },
+                }}
               />
             )}
           </div>

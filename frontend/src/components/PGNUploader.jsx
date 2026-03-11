@@ -18,10 +18,8 @@ export default function PGNUploader({ onAnalyze, loading }) {
 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. Nbd2 Bb7 12. Bc2 Re8 13. Nf1 Bf8
 14. Ng3 g6 15. Bg5 h6 16. Bd2 Bg7 17. a4 c5 18. d5 c4 19. b4 Nh5
 20. Nxh5 gxh5 21. Bh6 Nf6 22. Bxg7 Kxg7 23. Nh4 Rh8 24. Qf3 Qe7
-25. Qf6+ Qxf6 26. Nf5+ Kg6 27. Nxd6 Bc8 28. Nxe8 Qd8 29. Nxc7 Qxc7
-30. axb5 axb5 31. Rxa8 Bxh3 32. gxh3 Qc5 33. Ra7 Qd6 34. Kh2 Ng8
-35. f4 exf4 36. e5 Qd8 37. Bd1 f3 38. Bxf3 Ne7 39. e6 fxe6 40. dxe6 Nf5
-41. e7 Nxe7 42. Rxe7 1-0`;
+25. Qxf6+ Qxf6 26. Nf5+ Kg6 27. Nxd6 Bc8 28. Nxe8 Qd8 29. Nxc7 Qxc7
+30. axb5 axb5 31. Rxa8 Bxh3 32. gxh3 Qc5 33. Ra7 Qd6 1-0`;
 
   const handleSubmit = (e) => {
     e.preventDefault();
